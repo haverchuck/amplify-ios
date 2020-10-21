@@ -103,6 +103,23 @@ class GraphQLRequestModelTests: XCTestCase {
         XCTAssertNotNil(request.variables)
     }
 
+    func testPaginatedListQueryGraphQLRequest() {
+        let post = Post.keys
+        let predicate = post.id.eq("id") && (post.title.beginsWith("Title") || post.content.contains("content"))
+
+        var documentBuilder = ModelBasedGraphQLDocumentBuilder(modelType: Post.self, operationType: .query)
+        documentBuilder.add(decorator: DirectiveNameDecorator(type: .list))
+        documentBuilder.add(decorator: FilterDecorator(filter: predicate.graphQLFilter))
+        documentBuilder.add(decorator: PaginationDecorator(limit: 10))
+        let document = documentBuilder.build()
+
+        let request = GraphQLRequest<Post>.paginatedList(Post.self, where: predicate, limit: 10)
+
+        XCTAssertEqual(document.stringValue, request.document)
+        XCTAssert(request.responseType == List<Post>.self)
+        XCTAssertNotNil(request.variables)
+    }
+
     func testOnCreateSubscriptionGraphQLRequest() {
         var documentBuilder = ModelBasedGraphQLDocumentBuilder(modelType: Post.self, operationType: .subscription)
         documentBuilder.add(decorator: DirectiveNameDecorator(type: .onCreate))
