@@ -24,7 +24,11 @@ final class SQLiteStorageEngineAdapter: StorageEngineAdapter {
         var dbFilePath = SQLiteStorageEngineAdapter.getDbFilePath(databaseName: databaseName)
         try SQLiteStorageEngineAdapter.clearIfNewVersion(version: version, dbFilePath: dbFilePath)
 
+        
         let path = dbFilePath.absoluteString
+        
+        print("path!: " + path)
+
 
         let connection: Connection
         do {
